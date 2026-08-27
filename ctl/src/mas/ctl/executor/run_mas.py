@@ -12,12 +12,14 @@ from typing import TYPE_CHECKING, Any
 from mas.ctl.compose.runner import ComposeRequest, compose_run
 from mas.ctl.deployment.runtime_id import DEFAULT_RUNTIME_ID
 from mas.ctl.executor.mas_session import (
+    build_agent_controller,
     entry_agent_id,
     materialize_mas_compose,
     prepare_delegation_entry_session,
     wire_peer_delegation,
 )
 from mas.ctl.executor.stacks import ChainStartError
+from mas.ctl.session.mas_router import MasAddressRouter
 
 if TYPE_CHECKING:
     from mas.runtime.boundary.obs.plugins import ObsPluginSet
@@ -160,6 +162,10 @@ def execute_run_mas(
 
     ``flavour_spec`` is the resolved Flavour ``spec``; its ``bind.agent_comm``
     names the infra rows agent-to-agent calls ride.
+
+    Interactive/scripted input can address any materialized agent directly
+    with ``@agent_id: text`` (see ``mas.ctl.session.mas_router``); unaddressed
+    input still goes to the entry agent as before.
     """
     from mas.ctl.session.controller import ConversationConfig, SessionController, close_observability, run_session_loop
     from mas.ctl.ui.stdout import StdoutConversationDisplay
@@ -335,6 +341,17 @@ def execute_run_mas(
             working_memory_registry=getattr(prepared, "working_memory_registry", None),
             turn_guard=materialized.stack_handles.turn_lock(str(entry)),
         )
+
+        # '@agent_id: text' addresses any materialized agent; unaddressed input
+        # still goes straight to entry (no-op wrapper for a single-agent MAS).
+        controller = MasAddressRouter(
+            default=controller,
+            agent_ids=frozenset(materialized.materialized.instances),
+            build_controller=lambda aid: build_agent_controller(
+                materialized, aid, session_id=prepared.session_id, verbose=verbose
+            ),
+        )
+
         exit_code = run_session_loop(
             controller,
             interactive=interactive or not auto_hitl,

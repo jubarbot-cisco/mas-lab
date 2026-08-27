@@ -22,6 +22,7 @@ from mas.ctl.infra.identities import entry_agent_id as entry_agent_id
 from mas.ctl.infra.resolve import application_endpoint_is_used
 from mas.ctl.manifest.mas_agent_merge import enrich_entry_agent_for_delegation, wire_entry_engine_delegation
 from mas.ctl.session.controller import ConversationConfig, SessionController
+from mas.ctl.ui.stdout import StdoutConversationDisplay
 from mas.ctl.ui.turn_result import turn_failed, turn_failure_message
 from mas.library.standard.lib.stack.handle import RunTurnFn as RunTurnFn
 from mas.library.standard.lib.stack.handle import SessionTurn
@@ -514,6 +515,32 @@ def wire_peer_delegation(
         wired.add(agent_id)
         newly_wired.append(agent_id)
     return newly_wired
+
+
+def build_agent_controller(
+    materialized: MaterializedMas,
+    agent_id: str,
+    *,
+    session_id: str,
+    verbose: int = 0,
+) -> SessionController:
+    """Build a SessionController for one agent already materialized in this
+    MAS run, sharing the MAS-wide ``session_id`` — the same working-memory
+    bucket a peer's ``delegate_to_<agent_id>`` call uses (see
+    ``make_workflow_send``). Used by ``MasAddressRouter``.
+    """
+    instance = materialized.materialized.instances[agent_id]
+    instance.driver.agent_id = agent_id
+    display = StdoutConversationDisplay(agent_label=agent_id, verbose=verbose, show_labels=True)
+    return SessionController(
+        instance=instance,
+        display=display,
+        verbose=verbose,
+        agent_id=agent_id,
+        config=ConversationConfig(single_turn=True),
+        session_id=session_id,
+        turn_guard=materialized.stack_handles.turn_lock(agent_id),
+    )
 
 
 def make_workflow_send(
