@@ -440,7 +440,7 @@ class SessionController:
         return gov_is_hitl_pending(self.instance.kernel.q)
 
 
-def close_observability(controller: SessionController) -> None:
+def close_observability(controller: Any) -> None:
     if controller.obs_recorder is not None:
         controller.obs_recorder.close()
     elif hasattr(controller.instance, "obs_plugin_set") and controller.instance.obs_plugin_set:
@@ -448,12 +448,15 @@ def close_observability(controller: SessionController) -> None:
 
 
 def run_session_loop(
-    controller: SessionController,
+    controller: Any,
     *,
     interactive: bool,
     scripted: list[str],
 ) -> int:
-    """Single entry for ctl stdout executors. Returns process exit code (0 = ok)."""
+    """Single entry for ctl stdout executors. Returns process exit code (0 = ok).
+
+    ``controller`` is duck-typed (see ``MasAddressRouter``).
+    """
     from mas.ctl.ui.turn_result import turn_failed
 
     if interactive:

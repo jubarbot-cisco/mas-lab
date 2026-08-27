@@ -146,10 +146,29 @@ class OperatorConsole:
         if low in ("/help", "/?"):
             self._print_help()
             return True
+        if low == "/agents":
+            self._print_agents(controller)
+            return True
         return False
+
+    def _print_agents(self, controller: Any) -> None:
+        agent_ids = getattr(controller, "agent_ids", None)
+        if not agent_ids:
+            self.err.write("single-agent session — no other agents to address\n")
+            self.err.flush()
+            return
+        active = getattr(getattr(controller, "_active", None), "agent_id", None)
+        listing = ", ".join(f"{a}*" if a == active else a for a in sorted(agent_ids))
+        self.err.write(
+            f"agents: {listing}  ('*' = last addressed; use @agent_id: <text> to address one)\n"
+        )
+        self.err.flush()
 
     def _print_help(self) -> None:
         self.err.write(
-            "commands: /reset /pause /resume /abort /steer <text> /skills /skill <name> /quit\n"
+            "commands: /reset /pause /resume /abort /steer <text> /skills /skill <name> "
+            "/agents /quit\n"
+            "addressing: @agent_id: <text>  — send this turn to a specific MAS agent "
+            "(default: entry agent)\n"
         )
         self.err.flush()
