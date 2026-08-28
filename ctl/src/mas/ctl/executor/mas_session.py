@@ -478,6 +478,7 @@ def build_agent_controller(
     *,
     session_id: str,
     verbose: int = 0,
+    working_memory_registry: WorkingMemoryRegistry | None = None,
 ) -> SessionController:
     """Build a SessionController for one agent already materialized in this
     MAS run, sharing the MAS-wide ``session_id`` — the same working-memory
@@ -494,6 +495,7 @@ def build_agent_controller(
         agent_id=agent_id,
         config=ConversationConfig(single_turn=True),
         session_id=session_id,
+        working_memory_registry=working_memory_registry,
     )
 
 
