@@ -158,7 +158,7 @@ def _sh_agent_response(record: dict, ctx: TransformContext) -> list[dict]:
         {
             "kind": "user_response",
             **base,
-            "call_id": f"{ctx.turn_id}-resp",
+            "call_id": f"{ctx.agent_id}-{ctx.turn_id}-resp",
             **parent,
             "content": record.get("text", ""),
             "finish_reason": record.get("finish_reason", "stop"),

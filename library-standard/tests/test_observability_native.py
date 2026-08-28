@@ -145,6 +145,21 @@ def test_session_execution_start_parents_to_mas_call(tmp_path) -> None:
     assert lines[0]["parent_call_id"] == "mas-root"
 
 
+def test_user_response_call_id_is_agent_scoped() -> None:
+    """turn_id alone doesn't identify a turn: two agents can each be on 'u1'
+    at once in one run. Their user_response call_ids must stay distinct."""
+    transform = NativeObservabilityTransform()
+    call_ids = set()
+    for agent in ("alpha", "beta"):
+        ctx = TransformContext(agent_id=agent, run_id="run-1")
+        ctx.turn_id = "u1"
+        out = transform.transform(
+            {"_source": "session", "session_kind": "agent_response", "text": "hi"}, ctx=ctx
+        )
+        call_ids |= {e["call_id"] for e in out if e["kind"] == "user_response"}
+    assert len(call_ids) == 2
+
+
 def test_native_plugin_emits_tool_call(tmp_path) -> None:
     events_path = tmp_path / "events.jsonl"
     plugin = NativeObservabilityPlugin(
