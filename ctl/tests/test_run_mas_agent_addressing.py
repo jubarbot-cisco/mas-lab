@@ -7,7 +7,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from mas.ctl.executor import run_mas as run_mas_mod
+from mas.ctl.executor import running_mas as running_mas_mod
 from mas.ctl.executor.run_mas import execute_run_mas
 
 
@@ -55,9 +55,9 @@ def test_addressed_query_reaches_the_named_agent_not_the_entry(tmp_path):
     mas_path = _write_two_agent_mas(tmp_path)
 
     with patch.object(
-        run_mas_mod,
+        running_mas_mod,
         "build_agent_controller",
-        wraps=run_mas_mod.build_agent_controller,
+        wraps=running_mas_mod.build_agent_controller,
     ) as spy:
         rc = execute_run_mas(
             mas_path,

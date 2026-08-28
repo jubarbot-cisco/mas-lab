@@ -157,7 +157,7 @@ class OperatorConsole:
             self.err.write("single-agent session — no other agents to address\n")
             self.err.flush()
             return
-        active = getattr(getattr(controller, "_active", None), "agent_id", None)
+        active = getattr(controller, "active_agent_id", None)
         listing = ", ".join(f"{a}*" if a == active else a for a in sorted(agent_ids))
         self.err.write(
             f"agents: {listing}  ('*' = last addressed; use @agent_id: <text> to address one)\n"
