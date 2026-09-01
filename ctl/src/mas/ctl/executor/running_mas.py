@@ -53,6 +53,14 @@ class RunningMas:
         self.active_agent_id = controller.agent_id
         return controller.run_turn(text, **kwargs)
 
+    def tool_provider(self, agent_id: str):
+        """The agent's live ManifestToolProvider, or None if it has no tools."""
+        from mas.runtime.engine.leaf import leaf_engine
+
+        instance = self.materialized.materialized.instances.get(agent_id)
+        engine = getattr(getattr(instance, "driver", None), "engine", None)
+        return None if engine is None else getattr(leaf_engine(engine), "tool_provider", None)
+
     def close(self) -> None:
         close_observability(self.entry_controller)
         for recorder in self.scoped_recorders:

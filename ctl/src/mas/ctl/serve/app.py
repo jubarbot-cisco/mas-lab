@@ -19,6 +19,7 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.concurrency import run_in_threadpool
 from mas.ctl.executor.running_mas import RunningMas
+from mas.ctl.serve.mcp import ToolEntry, handle_rpc
 from mas.ctl.ui.turn_result import turn_to_agent_result
 
 logger = logging.getLogger(__name__)
@@ -60,9 +61,11 @@ def build_app(
     cards: dict[str, dict[str, Any]],
     *,
     token: str | None = None,
+    tools: dict[str, ToolEntry] | None = None,
 ) -> FastAPI:
     """FastAPI app serving ``mas``. ``token`` None disables auth."""
     app = FastAPI(title="mas-ctl serve-mas", version="0.1.0")
+    tools = {} if tools is None else tools
     # SessionController is sync and not thread-safe. One lock per agent: turns
     # to the same agent serialize (one conversation advances once at a time),
     # turns to different agents run in parallel.
@@ -115,6 +118,23 @@ def build_app(
             for agent_id in sorted(mas.agent_ids)
             if (url := (cards.get(agent_id) or {}).get("url"))
         ]
+
+    # ---- MCP --------------------------------------------------------------
+
+    async def call_tool(entry: ToolEntry, arguments: dict[str, Any]) -> str:
+        from mas.runtime.engine.tool_dispatch import execute_engine_tool
+
+        # The declaring agent's lock: a probe must not read half-applied state
+        # from a turn in flight. Returns str, exactly as the agent's own loop
+        # sees it — same formatting loss, same value.
+        async with locks[entry.agent_id]:
+            return await run_in_threadpool(
+                execute_engine_tool, entry.name, arguments=arguments, tool_provider=entry.provider
+            )
+
+    @app.post("/mcp", dependencies=auth)
+    async def mcp_rpc(body: dict[str, Any]) -> dict[str, Any]:
+        return await handle_rpc(body, tools, call_tool)
 
     @app.post("/agents/{agent_id}/ask", dependencies=auth)
     async def ask_agent(agent_id: str, body: dict[str, Any]) -> dict[str, Any]:
