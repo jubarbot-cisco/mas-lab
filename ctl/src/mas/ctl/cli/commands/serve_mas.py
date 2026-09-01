@@ -17,7 +17,7 @@ import click
 import yaml
 from mas.ctl.cli.obs_flags import observability_options, resolve_observability_config
 from mas.ctl.cli.runtime_flags import runtime_id_choice
-from mas.ctl.cli.trace_flags import trace_options
+from mas.ctl.cli.trace_flags import resolve_trace_settings, trace_options
 from mas.ctl.deployment.runtime_id import DEFAULT_RUNTIME_ID
 
 
@@ -60,11 +60,13 @@ def serve_mas_cmd(
     events_file,
     events_stdout,
     events_format,
-    trace: bool,
-    trace_timestamps: bool,
+    trace_mode: str | None,
+    no_trace: bool,
+    trace_timestamps: bool | None,
     trace_engine: bool,
     trace_summary: bool,
-    trace_color: bool,
+    trace_full: bool,
+    trace_color: bool | None,
 ) -> None:
     """Serve a MAS over HTTP: address each agent by id via REST or A2A."""
     from mas.ctl.paths import manifest_cwd, resolve_overlay_path
@@ -78,6 +80,7 @@ def serve_mas_cmd(
     from mas.ctl.executor.run_mas import build_running_mas
     from mas.ctl.serve.app import build_app
     from mas.ctl.serve.cards import build_cards
+    from mas.ctl.serve.mcp import build_tools
     from mas.ctl.session.flavour import FlavourError, resolve_flavour
 
     token = token or os.environ.get("MAS_SERVE_TOKEN")
@@ -94,6 +97,16 @@ def serve_mas_cmd(
     if manifest is None:
         manifest = "mas.yaml"
     verbose = int(ctx.obj.get("verbose", 0) if ctx.obj else 0)
+    trace = resolve_trace_settings(
+        trace_mode=trace_mode,
+        no_trace=no_trace,
+        trace_summary=trace_summary,
+        trace_full=trace_full,
+        trace_timestamps=trace_timestamps,
+        trace_engine=trace_engine,
+        trace_color=trace_color,
+        verbose=verbose,
+    )
 
     try:
         flavour_spec = resolve_flavour(flavour)
@@ -135,11 +148,7 @@ def serve_mas_cmd(
                 verbose=verbose,
                 manifest_dir=session.manifest_dir,
                 obs_config=obs_cfg,
-                trace=trace,
-                trace_timestamps=trace_timestamps,
-                trace_engine=trace_engine or verbose >= 2,
-                trace_summary=trace_summary,
-                trace_color=trace_color,
+                **trace.as_session_kwargs(),
             )
         except KeyError as exc:
             click.echo(f"error: {exc}", err=True)
@@ -153,12 +162,18 @@ def serve_mas_cmd(
             for query in queries:
                 router.run_turn(query)
 
+        tools = build_tools(mas)
         app = build_app(
             mas,
             build_cards(mas.materialized, base_url=base_url, secured=token is not None),
             token=token,
+            tools=tools,
         )
-        click.echo(f"serving {len(mas.agent_ids)} agents on {base_url}/agents", err=True)
+        click.echo(
+            f"serving {len(mas.agent_ids)} agents on {base_url}/agents "
+            f"and {len(tools)} tools on {base_url}/mcp",
+            err=True,
+        )
         try:
             uvicorn.run(app, host=host, port=port, log_level="info")
         finally:
