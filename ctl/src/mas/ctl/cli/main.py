@@ -20,6 +20,7 @@ from mas.ctl.cli.commands.plugin import plugin_group
 from mas.ctl.cli.commands.registry import registry_group
 from mas.ctl.cli.commands.run_mas import run_mas_cmd
 from mas.ctl.cli.commands.serve import serve_agent_cmd
+from mas.ctl.cli.commands.serve_mas import serve_mas_cmd
 from mas.ctl.cli.commands.tui import tui_cmd
 from mas.ctl.cli.commands.validate import schemas_cmd, validate_cmd
 from mas.ctl.cli.commands.workspace import flavour_group, infra_group
@@ -47,6 +48,7 @@ app.add_command(compile_cmd, name="compile")
 app.add_command(compose_cmd, name="compose")
 app.add_command(plan_cmd, name="plan")
 app.add_command(run_mas_cmd, name="run-mas")
+app.add_command(serve_mas_cmd, name="serve-mas")
 app.add_command(list_bundles_cmd, name="list-bundles")
 app.add_command(checkpoint_group, name="checkpoint")
 app.add_command(control_group, name="control")

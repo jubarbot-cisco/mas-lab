@@ -125,7 +125,7 @@ MAS control plane V2 — compile, compose, session, placement
 
 ```bash
 uv pip install -e ctl  # source
-uv pip install "mas-lab-ctl[curses,dev]"  # PyPI, all extras
+uv pip install "mas-lab-ctl[curses,serve,dev]"  # PyPI, all extras
 ```
 
 **Depends on:** `mas-lab-runtime`, `mas-lab-library-standard`, `mas-lab-library-skills`  
@@ -135,6 +135,7 @@ uv pip install "mas-lab-ctl[curses,dev]"  # PyPI, all extras
 | Extra    | Packages / features                              |
 | -------- | ------------------------------------------------ |
 | `curses` | `windows-curses>=2.3.2; sys_platform == 'win32'` |
+| `serve`  | `fastapi>=0.110`, `uvicorn[standard]>=0.27`      |
 | `dev`    | `pytest>=8.0`, `import-linter>=2.0`              |
 
 **CLI commands:**
