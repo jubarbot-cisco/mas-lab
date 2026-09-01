@@ -31,6 +31,10 @@ Issues = "https://github.com/outshift-open/mas-lab/issues"
 curses = [
     "windows-curses>=2.3.2; sys_platform == 'win32'",
 ]
+serve = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+]
 dev = [
     "pytest>=8.0",
     "import-linter>=2.0",
