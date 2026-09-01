@@ -17,7 +17,7 @@ workflows, and provides the **interactive** CLI (`chat`, `tui`) on top of
 
 ```
 mas-runtime  ←  single agent : kernel + contracts + design-pattern plugins
-mas-ctl      ←  multi-agent  : compile, compose, chat, run-mas, validate
+mas-ctl      ←  multi-agent  : compile, compose, chat, run-mas, serve-mas, validate
 mas-lab      ←  evaluation   : benchmarks, pipelines, controller UI
 ```
 
@@ -85,6 +85,7 @@ Named overlay for A/B configuration without duplicating manifests.
 | `mas-ctl chat MANIFEST` | Interactive or scripted conversation | [docs/cli/mas-ctl.md](../docs/cli/mas-ctl.md) |
 | `mas-ctl tui MANIFEST` | Terminal UI for chat | same · [docs/ctl/tui.md](../docs/ctl/tui.md) |
 | `mas-ctl run-mas MANIFEST` | Run a multi-agent workflow | [docs/cli/mas-ctl.md](../docs/cli/mas-ctl.md) |
+| `mas-ctl serve-mas MANIFEST` | Hold a MAS open and expose each agent over HTTP | [docs/serving-agents.md](docs/serving-agents.md) |
 | `mas-ctl compile …` | Dump resolved Agent/MAS YAML (overlays + defaults) | [docs/cli/compile.md](../docs/cli/compile.md) |
 | `mas-ctl compose …` | Compose effective manifests / placement | `mas-ctl compose --help` |
 | `mas-ctl plan …` | Dry-run placement plan | `mas-ctl plan --help` |
@@ -140,6 +141,7 @@ Flavours ship in **`library-standard`** and resolve by name:
 | Document | Covers |
 |----------|--------|
 | [../docs/user-guide.md](../docs/user-guide.md) | Operational guide |
+| [docs/serving-agents.md](docs/serving-agents.md) | Reach agents over REST / A2A (`serve-mas`) |
 | [../docs/cli/index.md](../docs/cli/index.md) | CLI overview |
 | [../docs/cli/mas-ctl.md](../docs/cli/mas-ctl.md) | `mas-ctl` flags (`--trace`, `--events`, …) |
 | [../docs/references/config.yaml.md](../docs/references/config.yaml.md) | `config.yaml` fields |
