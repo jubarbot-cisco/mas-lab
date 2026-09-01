@@ -50,6 +50,7 @@ answers with the bootstrap conversation in its history.
 | `POST /agents/{id}/ask` | Plain REST: `{"text": "..."}` |
 | `GET /agents/{id}/.well-known/agent-card.json` | A2A agent card |
 | `POST /agents/{id}/` | A2A JSON-RPC `message/send` |
+| `POST /mcp` | MCP JSON-RPC: `initialize`, `tools/list`, `tools/call` |
 
 REST serves local tooling and `curl`. A2A lets a foreign agent talk to ours with
 no client code written here. `GET /agents` is a deliberate non-A2A addition:
@@ -89,6 +90,35 @@ curl -s -X POST -H "Authorization: Bearer $MAS_SERVE_TOKEN" \
 Not implemented: `message/stream`, `tasks/get`, `tasks/cancel`, push
 notifications. Cards advertise `"streaming": false` so clients do not attempt
 them.
+
+## MCP
+
+A card says which tools an agent *claims*. `POST /mcp` lets you call one and see
+what it actually returns, so a client can fact-check an answer against the tool
+that produced it.
+
+```bash
+curl -s -X POST -H "Authorization: Bearer $MAS_SERVE_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":"1","method":"tools/call",
+       "params":{"name":"calc","arguments":{"expression":"2 + 40"}}}' \
+  localhost:8080/mcp
+```
+
+The tool set is flat and global, built once at startup from the agents' live
+tool providers. A tool declared by several agents is one entry listing all of
+them in `declared_by`; providers are per-agent but the tools are stateless, so
+the instances are interchangeable. Two agents declaring the same *name* with
+different contracts is disambiguated as `name@agent_id` — nothing is dropped and
+nothing is fatal, so every tool of every agent stays reachable.
+
+Calls run in the live MAS, on the same instances the agents use, under the
+declaring agent's lock. A value from a fresh instance would not be the value the
+agent saw. Results come back as text, exactly as the agent's own tool loop sees
+them. A tool that raises returns `isError: true` rather than a transport error —
+a failing tool is evidence, not an outage.
+
+Stateless: `initialize` returns no session id, and any sent is ignored.
 
 Cards are built once at startup by re-reading each agent's manifest, and describe
 what an agent **declares** — role, tools, delegation peers — never what it did.

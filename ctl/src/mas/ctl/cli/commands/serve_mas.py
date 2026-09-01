@@ -78,6 +78,7 @@ def serve_mas_cmd(
     from mas.ctl.executor.run_mas import build_running_mas
     from mas.ctl.serve.app import build_app
     from mas.ctl.serve.cards import build_cards
+    from mas.ctl.serve.mcp import build_tools
     from mas.ctl.session.flavour import FlavourError, resolve_flavour
 
     token = token or os.environ.get("MAS_SERVE_TOKEN")
@@ -153,12 +154,18 @@ def serve_mas_cmd(
             for query in queries:
                 router.run_turn(query)
 
+        tools = build_tools(mas)
         app = build_app(
             mas,
             build_cards(mas.materialized, base_url=base_url, secured=token is not None),
             token=token,
+            tools=tools,
         )
-        click.echo(f"serving {len(mas.agent_ids)} agents on {base_url}/agents", err=True)
+        click.echo(
+            f"serving {len(mas.agent_ids)} agents on {base_url}/agents "
+            f"and {len(tools)} tools on {base_url}/mcp",
+            err=True,
+        )
         try:
             uvicorn.run(app, host=host, port=port, log_level="info")
         finally:
