@@ -17,7 +17,7 @@ workflows, and provides the **interactive** CLI (`chat`, `tui`) on top of
 
 ```
 mas-runtime  ←  single agent : kernel + contracts + design-pattern plugins
-mas-ctl      ←  multi-agent  : compose, chat, run-mas, validate
+mas-ctl      ←  multi-agent  : compose, chat, run-mas, serve-mas, validate
 mas-lab      ←  evaluation   : benchmarks, pipelines, controller UI
 ```
 
@@ -85,6 +85,7 @@ Named overlay for A/B configuration without duplicating manifests.
 | `mas-ctl chat MANIFEST` | Interactive or scripted conversation |
 | `mas-ctl tui MANIFEST` | Terminal UI for chat |
 | `mas-ctl run-mas MANIFEST` | Run a multi-agent workflow |
+| `mas-ctl serve-mas MANIFEST` | Hold a MAS open and expose each agent over HTTP |
 | `mas-ctl compose …` | Compose effective manifests / placement |
 | `mas-ctl plan …` | Dry-run placement plan |
 | `mas-ctl validate PATH …` | Validate agent / MAS / experiment YAML |
@@ -139,6 +140,7 @@ Flavours ship in **`library-standard`** and resolve by name:
 | Document | Covers |
 |----------|--------|
 | [docs/user-guide.md](docs/user-guide.md) | Operational guide |
+| [docs/serving-agents.md](docs/serving-agents.md) | Reach agents over REST / A2A (`serve-mas`) |
 | [docs/developer-guide.md](docs/developer-guide.md) | Manifest and compose extensions |
 | [../docs/manifests/](../docs/manifests/README.md) | YAML reference |
 | [../docs/libraries.md](../docs/libraries.md) | Package matrix |
