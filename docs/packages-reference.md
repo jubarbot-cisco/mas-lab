@@ -18,6 +18,7 @@
 | `mas-library-lab`      | Libraries     | MAS Lab provider library with public eval plugins.                                         | —                    |
 | `mas-library-samples`  | Libraries     | Community-contributed MAS sample apps, datasets, and tools.                                | —                    |
 | `mas-library-ioa`      | Libraries     | MCP client/server bridge for MAS Lab                                                       | `mas-mcp`            |
+| `mas-library-mad`      | Libraries     | Multi-agent debate (MAD) attack environment ported onto mas-lab.                           | `mad-maslab`         |
 ---
 
 ## Installation
@@ -323,6 +324,28 @@ uv pip install "mas-library-ioa[all]"  # PyPI, all extras
 | Command   | Entry point                           |
 | --------- | ------------------------------------- |
 | `mas-mcp` | `library_ioa.plugins.mcp.server:main` |
+
+**Entry-point group `mas.runtime.manifest_libraries`:** registers 1 item(s) in `runtime.manifest_libraries`.
+
+---
+
+### `mas-library-mad`
+**Install path:** `library-mad`  
+**Layer:** Libraries  
+Multi-agent debate (MAD) attack environment ported onto mas-lab.
+
+```bash
+uv pip install -e library-mad  # source
+uv pip install mas-library-mad  # PyPI
+```
+
+**Depends on:** `mas-runtime`, `mas-library-standard`  
+
+**CLI commands:**
+
+| Command      | Entry point                |
+| ------------ | -------------------------- |
+| `mad-maslab` | `mas.library.mad.cli:main` |
 
 **Entry-point group `mas.runtime.manifest_libraries`:** registers 1 item(s) in `runtime.manifest_libraries`.
 

@@ -22,7 +22,7 @@ tasks:
       new dependencies. For all libraries + extras use: task install-all
     cmds:
       - test -d .venv || uv venv .venv
-      - uv pip install -e runtime -e ctl -e library-standard -e library-ioa -e library-skills -e library-eval -e library-lab -e lab/components/core -e lab/components/bench -e lab/components/controller -e lab
+      - uv pip install -e runtime -e ctl -e library-standard -e library-ioa -e library-mad -e library-skills -e library-eval -e library-lab -e lab/components/core -e lab/components/bench -e lab/components/controller -e lab
       - .venv/bin/python -c "import mas.lab.controller; print('mas-lab-controller OK')"
 
   install-dev:
@@ -102,6 +102,7 @@ tasks:
           library-standard/tests/ \
           library-eval/tests/ \
           library-ioa/tests/ \
+          library-mad/tests/ \
           -q --tb=line
       - |
         # Separate invocation: library-skills/tests/ is its own `tests` package

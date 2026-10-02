@@ -494,6 +494,7 @@ PACKAGE_REGISTRY: list[tuple[str, str, str]] = [
     ("library-lab/pyproject.toml", "library-lab", "Libraries"),
     ("library-samples/pyproject.toml", "library-samples", "Libraries"),
     ("library-ioa/pyproject.toml", "library-ioa", "Libraries"),
+    ("library-mad/pyproject.toml", "library-mad", "Libraries"),
 ]
 
 # Library manifests: (library.yaml relative path, library package name)
