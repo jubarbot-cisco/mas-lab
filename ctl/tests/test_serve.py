@@ -178,7 +178,9 @@ def test_serves_a_real_mas_with_cards_read_from_manifests(tmp_path):
         )
     try:
         cards = build_cards(mas.materialized, base_url="http://test", secured=False)
-        assert cards["beta"]["description"] == "You count."
+        assert cards["beta"]["description"] == "test agent"
+        assert "You count." not in str(cards["beta"])
+        assert cards["beta"]["skills"] == []
         assert cards["alpha"]["url"] == "http://test/agents/alpha/"
 
         client = TestClient(build_app(mas, cards, token=None))

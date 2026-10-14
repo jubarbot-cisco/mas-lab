@@ -93,9 +93,8 @@ them.
 
 ## MCP
 
-A card says which tools an agent *claims*. `POST /mcp` lets you call one and see
-what it actually returns, so a client can fact-check an answer against the tool
-that produced it.
+`POST /mcp` lets you call an agent's tools and see what they actually return, so
+a client can fact-check an answer against the tool that produced it.
 
 ```bash
 curl -s -X POST -H "Authorization: Bearer $MAS_SERVE_TOKEN" \
@@ -120,10 +119,9 @@ a failing tool is evidence, not an outage.
 
 Stateless: `initialize` returns no session id, and any sent is ignored.
 
-Cards are built once at startup by re-reading each agent's manifest, and describe
-what an agent **declares** — role, tools, delegation peers — never what it did.
-A client comparing the declared role against actual replies is comparing claim
-against behaviour, which is the point.
+Cards are built once at startup by re-reading each agent's manifest. They expose
+only the agent's `spec.description`. Role, context, system prompt, tools and
+delegation peers stay private, and `skills` is always empty.
 
 ## Authentication
 
